@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Стиль Калькулятор</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0e1621; /* Цвет фона Telegram */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .calculator {
+            background-color: #17212b; /* Цвет блоков Telegram */
+            width: 100%;
+            max-width: 360px;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .display {
+            width: 100%;
+            height: 80px;
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 2.5rem;
+            text-align: right;
+            padding: 10px;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        button {
+            padding: 20px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            background-color: #24303f;
+            color: #ffffff;
+            transition: background-color 0.2s, transform 0.1s;
+            aspect-ratio: 1; /* Делает кнопки идеально круглыми */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* Стиль для операторов (+, -, *, /, =) */
+        button.operator {
+            background-color: #5288c1; /* Фирменный синий Telegram */
+            color: #ffffff;
+        }
+
+        button.operator:hover {
+            background-color: #4676a8;
+        }
+
+        /* Стиль для кнопок очистки и удаления */
+        button.clear {
+            background-color: #ff595a;
+            color: #ffffff;
+        }
+
+        button.clear:hover {
+            background-color: #e04f50;
+        }
+
+        button:hover:not(.operator):not(.clear) {
+            background-color: #2b394a;
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator">
+    <!-- Экран калькулятора -->
+    <input type="text" class="display" id="display" value="0" readonly>
+    
+    <!-- Кнопки -->
+    <div class="buttons">
+        <button class="clear" onclick="clearDisplay()">C</button>
+        <button onclick="appendValue('(')">(</button>
+        <button onclick="appendValue(')')">)</button>
+        <button class="operator" onclick="appendValue('/')">÷</button>
+
+        <button onclick="appendValue('7')">7</button>
+        <button onclick="appendValue('8')">8</button>
+        <button onclick="appendValue('9')">9</button>
+        <button class="operator" onclick="appendValue('*')">×</button>
+
+        <button onclick="appendValue('4')">4</button>
+        <button onclick="appendValue('5')">5</button>
+        <button onclick="appendValue('6')">6</button>
+        <button class="operator" onclick="appendValue('-')">-</button>
+
+        <button onclick="appendValue('1')">1</button>
+        <button onclick="appendValue('2')">2</button>
+        <button onclick="appendValue('3')">3</button>
+        <button class="operator" onclick="appendValue('+')">+</button>
+
+        <button onclick="appendValue('0')">0</button>
+        <button onclick="appendValue('.')">.</button>
+        <button onclick="backspace()">⌫</button>
+        <button class="operator" onclick="calculate()">=</button>
+    </div>
+</div>
+
+<script>
+    const display = document.getElementById('display');
+
+    // Добавление символа на экран
+    function appendValue(val) {
+        if (display.value === '0' && val !== '.') {
+            display.value = val;
+        } else {
+            display.value += val;
+        }
+    }
+
+    // Полная очистка (кнопка C)
+    function clearDisplay() {
+        display.value = '0';
+    }
+
+    // Удаление последнего символа (кнопка ⌫)
+    function backspace() {
+        if (display.value.length > 1) {
+            display.value = display.value.slice(0, -1);
+        } else {
+            display.value = '0';
+        }
+    }
+
+    // Вычисление результата
+    function calculate() {
+        try {
+            // Заменяем визуальные знаки на математические перед вычислением
+            let expression = display.value;
+            
+            // Безопасное вычисление строки
+            let result = new Function('return ' + expression)();
+            
+            // Проверка на деление на ноль или ошибки
+            if (result === Infinity || isNaN(result)) {
+                display.value = 'Ошибка';
+            } else {
+                // Округляем до 8 знаков, чтобы избежать проблем с 0.1 + 0.2
+                display.value = Number(result.toFixed(8)).toString();
+            }
+        } catch (error) {
+            display.value = 'Ошибка';
+        }
+    }
+</script>
+
+</body>
+</html>
